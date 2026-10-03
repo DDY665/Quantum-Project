@@ -1,0 +1,17 @@
+[project]
+name = "ai-quantum-pnemonia-detection"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "imagehash>=4.3",
+    "matplotlib>=3.11.1",
+    "numpy>=1.26,<3",
+    "pandas>=2.2,<3",
+    "pillow>=10.0",
+    "pydicom>=3.0",
+    "scikit-learn>=1.9.0",
+    "torch>=2.13.0",
+    "torchvision>=0.28.0",
+]

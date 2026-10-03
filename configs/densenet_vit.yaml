@@ -1,0 +1,21 @@
+model:
+  pretrained: true
+  num_classes: 2
+  dropout_rate: 0.5
+  vit_variant: "vit_b_16"
+  fusion: "concat"
+
+training:
+  num_epochs: 30
+  learning_rate: 0.00005    # Slightly lower LR because of ViT sensitivity
+  weight_decay: 0.0001
+  early_stopping_patience: 5
+  scheduler: "cosine"
+  checkpoint_metric: "val_loss"
+
+dataloader:
+  batch_size: 16            # Reduced from 32 to avoid Out-Of-Memory (OOM) on 8GB GPU
+  num_workers: 0
+  image_size: 224
+  random_seed: 42
+

@@ -1,0 +1,42 @@
+PNEUMONIA DATASET INSPECTION REPORT
+======================================================================
+
+KERMANY DATASET
+--------------------------------------------------
+Total images: 11712
+
+Split distribution:
+  train: 10432
+  val: 32
+  test: 1248
+
+Class distribution:
+  NORMAL: 3166
+  PNEUMONIA: 8546
+
+Split/class distribution:
+
+  TRAIN
+    NORMAL: 2682
+    PNEUMONIA: 7750
+
+  VAL
+    NORMAL: 16
+    PNEUMONIA: 16
+
+  TEST
+    NORMAL: 468
+    PNEUMONIA: 780
+
+Corrupted images: 0
+Unknown split: 0
+Unknown class: 0
+
+
+RSNA DATASET
+--------------------------------------------------
+DICOM files: 29684
+Label rows: 30227
+Unique patients: 26684
+
+Inspection complete.

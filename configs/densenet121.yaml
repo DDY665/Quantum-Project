@@ -1,0 +1,19 @@
+model:
+  pretrained: true
+  num_classes: 2
+  dropout_rate: 0.5
+
+training:
+  num_epochs: 30
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  early_stopping_patience: 5
+  scheduler: "cosine"
+  checkpoint_metric: "val_loss"
+
+dataloader:
+  batch_size: 32
+  num_workers: 0
+  image_size: 224
+  random_seed: 42
+

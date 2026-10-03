@@ -1,0 +1,28 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Model Checkpoints (weights > 100MB exceed GitHub file limit)
+checkpoints/*.pt
+checkpoints/*.pth
+!checkpoints/.gitkeep
+
+# Large Archives & Raw Data
+*.rar
+*.zip
+*.tar.gz
+data/raw/
+data/processed.rar
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

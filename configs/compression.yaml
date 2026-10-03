@@ -1,0 +1,22 @@
+model:
+  pretrained: true
+  num_classes: 2
+  fusion_dim: 1792
+  hidden_dim: 128
+  output_dim: 8              # 8-dimensional representation (for 8 qubits in 4-2)
+  dropout_rate: 0.2
+  use_tanh_scaling: true     # Bounded in [-1, 1] for rotation angle encoding
+
+training:
+  num_epochs: 25
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  early_stopping_patience: 5
+  scheduler: "cosine"
+  checkpoint_metric: "val_loss"
+
+dataloader:
+  batch_size: 16
+  num_workers: 0
+  image_size: 224
+  random_seed: 42

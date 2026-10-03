@@ -1,0 +1,14 @@
+quantum:
+  n_qubits: 8
+  n_layers: 3
+  rotation: "Y"
+  entanglement: "circular"
+  device_name: "default.qubit"
+
+training:
+  num_epochs: 20
+  learning_rate: 0.05       # Standard learning rate for quantum parameter shift / backprop
+  weight_decay: 0.00001
+  early_stopping_patience: 5
+  scheduler: "cosine"
+  batch_size: 64            # Faster quantum batch simulation
