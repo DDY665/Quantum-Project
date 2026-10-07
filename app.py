@@ -522,11 +522,70 @@ with tab3:
             text_auto=True,
             title=f"Pairwise Prediction Consistency for [{st.session_state.image_name}]"
         )
-        fig_agree.update_layout(height=280, margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig_agree, use_container_width=True)
+        st.divider()
+
+        # 4. COMPREHENSIVE ML PERFORMANCE EVALUATION GRAPHS
+        st.subheader("4. Machine Learning Performance Graphs")
+        st.caption("Standard ML benchmark graphs evaluating DenseNet vs. ViT vs. Quantum VQC:")
+
+        # Accuracy Bar Chart
+        g1_p = FIGURES_DIR / "graph1_accuracy_comparison.png"
+        if g1_p.exists():
+            st.markdown("##### A. Accuracy Comparison Bar Chart")
+            st.image(str(g1_p), caption="Test Accuracy Comparison across DenseNet, ViT, and Quantum VQC", use_container_width=True)
+
+        st.divider()
+
+        # Precision, Recall, F1 Bar Chart
+        g2_p = FIGURES_DIR / "graph2_metrics_comparison.png"
+        if g2_p.exists():
+            st.markdown("##### B. Precision, Recall, F1-Score, and ROC-AUC Comparison")
+            st.image(str(g2_p), caption="Precision, Recall, F1-Score, and ROC-AUC Comparison", use_container_width=True)
+
+        st.divider()
+
+        # ROC Curves Comparison
+        g3_p = FIGURES_DIR / "graph3_roc_comparison.png"
+        if g3_p.exists():
+            st.markdown("##### C. Receiver Operating Characteristic (ROC) Curves")
+            st.image(str(g3_p), caption="Comparative ROC Curves: DenseNet vs. ViT vs. Quantum VQC", use_container_width=True)
+
+        st.divider()
+
+        # Confusion Matrices for Each Model
+        st.markdown("##### D. Confusion Matrices for Each Model")
+        cm_c1, cm_c2, cm_c3 = st.columns(3)
+        cm_dense_p = FIGURES_DIR / "densenet121_dataset_A_cm.png"
+        cm_vit_p = FIGURES_DIR / "densenet_vit_dataset_A_cm.png"
+        cm_vqc_p = FIGURES_DIR / "vqc_dataset_A_cm.png"
+
+        with cm_c1:
+            if cm_dense_p.exists():
+                st.image(str(cm_dense_p), caption="DenseNet-121 Confusion Matrix", use_container_width=True)
+        with cm_c2:
+            if cm_vit_p.exists():
+                st.image(str(cm_vit_p), caption="Vision Transformer (ViT) Confusion Matrix", use_container_width=True)
+        with cm_c3:
+            if cm_vqc_p.exists():
+                st.image(str(cm_vqc_p), caption="Quantum VQC Confusion Matrix", use_container_width=True)
+
+        st.divider()
+
+        # Training & Validation Curves
+        st.markdown("##### E. Training and Validation Convergence Curves")
+        c_curv1, c_curv2 = st.columns(2)
+        loss_p = FIGURES_DIR / "graph4_loss_curves.png"
+        acc_p = FIGURES_DIR / "graph5_accuracy_curves.png"
+
+        with c_curv1:
+            if loss_p.exists():
+                st.image(str(loss_p), caption="Training & Validation Loss Curves", use_container_width=True)
+        with c_curv2:
+            if acc_p.exists():
+                st.image(str(acc_p), caption="Training & Validation Accuracy Curves", use_container_width=True)
 
     else:
-        st.info("👆 Please upload an image in Tab 1 to view live ML inference telemetry.")
+        st.info("👆 Please upload an image in Tab 1 to activate live ML inference analysis.")
 
 # ============================================================================
 # TAB 4: OVERALL TRAINING & PERFORMANCE (STATIC)
