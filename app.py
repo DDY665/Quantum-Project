@@ -1,7 +1,5 @@
-import os
 import sys
 import time
-import math
 from pathlib import Path
 from PIL import Image
 import numpy as np
@@ -10,7 +8,6 @@ import streamlit as st
 import torch
 import torchvision.transforms as transforms
 import plotly.graph_objects as go
-import plotly.express as px
 
 # 1. PAGE SETUP
 st.set_page_config(
@@ -28,7 +25,6 @@ from models.compressed_model import build_compressed_model
 from models.vqc import build_vqc
 
 FIGURES_DIR = PROJECT_ROOT / "results" / "figures"
-TABLES_DIR = PROJECT_ROOT / "results" / "tables"
 
 # 2. CACHED MODEL LOADER
 @st.cache_resource(show_spinner=False)
@@ -176,9 +172,6 @@ def execute_live_inference(image: Image.Image):
         probs_vqc = torch.softmax(out_vqc, dim=1)[0].numpy()
     lat_vqc = (time.time() - t0) * 1000
 
-    z_vals = z_cpu[0].numpy()
-    angles_deg = z_vals * 180.0
-
     return {
         "dense": {
             "p_norm": float(probs_dense[0] * 100),
@@ -199,9 +192,7 @@ def execute_live_inference(image: Image.Image):
             "p_pneu": float(probs_vqc[1] * 100),
             "pred": "Pneumonia" if probs_vqc[1] >= 0.5 else "Normal / No Pneumonia",
             "conf": float(max(probs_vqc) * 100),
-            "latency": lat_vqc,
-            "z_latent": z_vals,
-            "angles_deg": angles_deg
+            "latency": lat_vqc
         }
     }
 
