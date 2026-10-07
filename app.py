@@ -410,18 +410,3 @@ with tab3:
     with cm_c3:
         if cm_vqc_p.exists():
             st.image(str(cm_vqc_p), caption="Quantum VQC Confusion Matrix", use_container_width=True)
-
-    st.divider()
-
-    # Training & Validation Curves
-    st.subheader("5. Training and Validation Convergence Curves")
-    c_curv1, c_curv2 = st.columns(2)
-    loss_p = FIGURES_DIR / "graph4_loss_curves.png"
-    acc_p = FIGURES_DIR / "graph5_accuracy_curves.png"
-
-    with c_curv1:
-        if loss_p.exists():
-            st.image(str(loss_p), caption="Static Figure: Training & Validation Loss Curves", use_container_width=True)
-    with c_curv2:
-        if acc_p.exists():
-            st.image(str(acc_p), caption="Static Figure: Training & Validation Accuracy Curves", use_container_width=True)
