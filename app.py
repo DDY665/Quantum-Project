@@ -250,32 +250,6 @@ with tab1:
             )
             st.plotly_chart(fig_prob, use_container_width=True)
 
-        st.divider()
-        st.subheader("3. LIVE Confidence Gauge Meter")
-        
-        # LIVE GAUGE METER
-        fig_gauge = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=final_conf,
-            title={'text': f"Confidence Level for [{final_class}]", 'font': {'size': 18}},
-            gauge={
-                'axis': {'range': [50, 100], 'tickwidth': 1},
-                'bar': {'color': "#EF4444" if final_class == "Pneumonia" else "#10B981"},
-                'steps': [
-                    {'range': [50, 75], 'color': "#FEF3C7"},
-                    {'range': [75, 90], 'color': "#E0E7FF"},
-                    {'range': [90, 100], 'color': "#DCFCE7"}
-                ],
-                'threshold': {
-                    'line': {'color': "black", 'width': 4},
-                    'thickness': 0.75,
-                    'value': final_conf
-                }
-            }
-        ))
-        fig_gauge.update_layout(height=260, margin=dict(l=30, r=30, t=40, b=20))
-        st.plotly_chart(fig_gauge, use_container_width=True)
-
     else:
         st.info("👆 Please upload a chest X-ray or click one of the sample buttons above to generate live predictions.")
 
@@ -327,7 +301,7 @@ with tab2:
         st.divider()
 
         # LIVE GROUPED BAR CHART: NORMAL VS PNEUMONIA ACROSS MODELS
-        st.subheader("1. LIVE Grouped Bar Chart: Probability Comparison")
+        st.subheader("LIVE Grouped Bar Chart: Probability Comparison")
         fig_grouped = go.Figure(data=[
             go.Bar(
                 name="Normal Probability",
@@ -354,71 +328,6 @@ with tab2:
             margin=dict(l=20, r=20, t=50, b=20)
         )
         st.plotly_chart(fig_grouped, use_container_width=True)
-
-        st.divider()
-
-        # LIVE RADAR / SPIDER CHART COMPARISON
-        col_radar, col_conf_bar = st.columns(2)
-        
-        with col_radar:
-            st.subheader("2. LIVE Radar Chart: Model Response Profile")
-            categories = ["Pneumonia Conf.", "Normal Conf.", "Softmax Margin", "Certainty (1-Entropy)"]
-            
-            # Helper to compute certainty (1 - normalized Shannon entropy)
-            def get_certainty(p1, p2):
-                p = np.array([p1/100.0, p2/100.0]) + 1e-12
-                ent = -np.sum(p * np.log2(p)) # in [0, 1] for 2 classes
-                return (1.0 - ent) * 100
-
-            fig_radar = go.Figure()
-            
-            fig_radar.add_trace(go.Scatterpolar(
-                r=[res["dense"]["p_pneu"], res["dense"]["p_norm"], abs(res["dense"]["p_pneu"] - res["dense"]["p_norm"]), get_certainty(res["dense"]["p_norm"], res["dense"]["p_pneu"])],
-                theta=categories,
-                fill='toself',
-                name='DenseNet',
-                line_color='#2563EB'
-            ))
-            fig_radar.add_trace(go.Scatterpolar(
-                r=[res["vit"]["p_pneu"], res["vit"]["p_norm"], abs(res["vit"]["p_pneu"] - res["vit"]["p_norm"]), get_certainty(res["vit"]["p_norm"], res["vit"]["p_pneu"])],
-                theta=categories,
-                fill='toself',
-                name='ViT',
-                line_color='#7C3AED'
-            ))
-            fig_radar.add_trace(go.Scatterpolar(
-                r=[res["quantum"]["p_pneu"], res["quantum"]["p_norm"], abs(res["quantum"]["p_pneu"] - res["quantum"]["p_norm"]), get_certainty(res["quantum"]["p_norm"], res["quantum"]["p_pneu"])],
-                theta=categories,
-                fill='toself',
-                name='Quantum Model',
-                line_color='#059669'
-            ))
-            fig_radar.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-                title="Live Multi-Axis Inference Profile",
-                height=340,
-                margin=dict(l=30, r=30, t=40, b=20)
-            )
-            st.plotly_chart(fig_radar, use_container_width=True)
-
-        with col_conf_bar:
-            st.subheader("3. LIVE Confidence Score Comparison")
-            fig_conf = go.Figure(data=[
-                go.Bar(
-                    x=["DenseNet", "Vision Transformer", "Quantum Model"],
-                    y=[res["dense"]["conf"], res["vit"]["conf"], res["quantum"]["conf"]],
-                    marker_color=["#2563EB", "#7C3AED", "#059669"],
-                    text=[f"{res['dense']['conf']:.2f}%", f"{res['vit']['conf']:.2f}%", f"{res['quantum']['conf']:.2f}%"],
-                    textposition="auto"
-                )
-            ])
-            fig_conf.update_layout(
-                title=f"Diagnostic Confidence on [{st.session_state.image_name}]",
-                yaxis=dict(title="Confidence (%)", range=[50, 105]),
-                height=340,
-                margin=dict(l=20, r=20, t=40, b=20)
-            )
-            st.plotly_chart(fig_conf, use_container_width=True)
 
     else:
         st.info("👆 Please upload an image in Tab 1 to activate the live model comparator.")
