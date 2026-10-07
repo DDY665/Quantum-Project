@@ -355,29 +355,18 @@ with tab3:
         "Recall (%)": ["99.54%", "99.54%", "98.75%"],
         "F1-score (%)": ["99.54%", "99.54%", "98.74%"],
         "ROC-AUC (%)": ["99.98%", "99.88%", "99.01%"],
-        "Specificity (%)": ["99.37%", "98.32%", "96.00%"],
-        "Trainable Parameters": ["7,030,000", "93,200,000", "90 (1,000,000x lighter)"]
+        "Specificity (%)": ["99.37%", "98.32%", "96.00%"]
     })
     st.dataframe(comp_df, use_container_width=True, hide_index=True)
 
     st.divider()
 
-    # 2. TRAINING PARAMETERS & METADATA
-    st.subheader("2. Training Parameters & Dataset Specification")
-    c_p1, c_p2 = st.columns(2)
-    with c_p1:
-        st.markdown("**Training Hyperparameters:**")
-        st.markdown("- **Epochs:** 15 epochs with early stopping")
-        st.markdown("- **Batch Size:** 32 (Classical) / 64 (Quantum)")
-        st.markdown("- **Optimizer:** AdamW (lr=0.0001 for DenseNet/ViT, lr=0.035 for VQC)")
-        st.markdown("- **Learning Rate Schedule:** CosineAnnealingLR")
-        st.markdown("- **Input Resolution:** 224 × 224 pixels (3 channels)")
-    with c_p2:
-        st.markdown("**Dataset Information:**")
-        st.markdown("- **Dataset A:** Kermany pediatric chest X-ray cohort (5,856 radiographs)")
-        st.markdown("- **Dataset B:** Cross-domain Kermany + RSNA adult cohort (balanced)")
-        st.markdown("- **Class Split:** PNEUMONIA vs. NON_PNEUMONIA (Normal)")
-        st.markdown("- **Data Split:** 70% Train, 15% Validation, 15% Test")
+    # 2. DATASET INFORMATION
+    st.subheader("2. Dataset Information")
+    st.markdown("- **Dataset A:** Kermany pediatric chest X-ray cohort (5,856 radiographs)")
+    st.markdown("- **Dataset B:** Cross-domain Kermany + RSNA adult cohort (balanced)")
+    st.markdown("- **Class Split:** PNEUMONIA vs. NON_PNEUMONIA (Normal)")
+    st.markdown("- **Data Split:** 70% Train, 15% Validation, 15% Test")
 
     st.divider()
 
