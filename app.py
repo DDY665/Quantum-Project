@@ -95,6 +95,54 @@ if "image_name" not in st.session_state:
     st.session_state.image_name = ""
 if "live_results" not in st.session_state:
     st.session_state.live_results = None
+if "validation_error" not in st.session_state:
+    st.session_state.validation_error = None
+
+# ============================================================================
+# CHEST X-RAY VALIDATOR / OUT-OF-DISTRIBUTION (OOD) SCREENING
+# ============================================================================
+def validate_chest_xray(img: Image.Image) -> tuple[bool, str]:
+    """
+    Quality & Out-Of-Distribution (OOD) Gate:
+    Verifies that the uploaded image meets the radiological and visual characteristics 
+    of a thoracic chest X-ray before invoking deep learning and quantum classifiers.
+    """
+    w, h = img.size
+    aspect = w / h
+    if aspect > 2.3 or aspect < 0.45:
+        return False, f"Abnormal aspect ratio ({aspect:.2f}). Chest radiographs typically have an aspect ratio between 0.5 and 2.0."
+
+    # Fast 224x224 sampling for statistical evaluation
+    small_img = img.resize((224, 224))
+    arr = np.array(small_img.convert("RGB")).astype(np.float32)
+
+    # 1. Color Saturation Check (Medical radiographs are strictly monochromatic)
+    ch_diff = float(np.mean(np.std(arr, axis=2)))
+    if ch_diff > 3.0:
+        return False, f"Color saturation detected (chroma score: {ch_diff:.1f}). Medical radiographs are grayscale. Color photos, screenshots, or documents are out-of-distribution."
+
+    # 2. Dynamic Range & Contrast Check
+    gray = np.mean(arr, axis=2)
+    mean_val = float(np.mean(gray))
+    std_val = float(np.std(gray))
+
+    if std_val < 20.0:
+        return False, f"Flat / low-contrast image (contrast std: {std_val:.1f}). Radiographs require distinct anatomical contrast between bone and lung fields."
+
+    if mean_val < 25.0 or mean_val > 225.0:
+        return False, f"Extreme exposure (mean intensity: {mean_val:.1f}). Image is severely under- or over-exposed."
+
+    # 3. Document / Paper Background Check (Text documents have >40% paper-white pixels)
+    white_fraction = float(np.mean(gray > 210))
+    if white_fraction > 0.40:
+        return False, f"Predominantly white background ({white_fraction*100:.1f}%). Matches text document/paper rather than a thoracic radiograph."
+
+    # 4. Black empty image / void frame check
+    black_fraction = float(np.mean(gray < 15))
+    if black_fraction > 0.75:
+        return False, f"Predominantly empty black frame ({black_fraction*100:.1f}%). Missing anatomical lung structures."
+
+    return True, "Valid Chest X-Ray"
 
 # ============================================================================
 # LIVE INFERENCE EXECUTION
@@ -184,9 +232,17 @@ with tab1:
             key="xray_uploader"
         )
         if uploaded_file is not None:
-            st.session_state.active_image = Image.open(uploaded_file)
-            st.session_state.image_name = uploaded_file.name
-            st.session_state.live_results = execute_live_inference(st.session_state.active_image)
+            if st.session_state.image_name != uploaded_file.name:
+                img = Image.open(uploaded_file)
+                st.session_state.active_image = img
+                st.session_state.image_name = uploaded_file.name
+                is_valid, err_msg = validate_chest_xray(img)
+                if is_valid:
+                    st.session_state.validation_error = None
+                    st.session_state.live_results = execute_live_inference(img)
+                else:
+                    st.session_state.validation_error = err_msg
+                    st.session_state.live_results = None
 
     with col_samples:
         st.markdown("**Or test with sample radiographs:**")
@@ -194,18 +250,38 @@ with tab1:
         with cs1:
             if st.button("Load Pneumonia Sample", use_container_width=True):
                 if SAMPLE_PNEU.exists():
-                    st.session_state.active_image = Image.open(SAMPLE_PNEU)
+                    img = Image.open(SAMPLE_PNEU)
+                    st.session_state.active_image = img
                     st.session_state.image_name = "Sample: Bacterial Pneumonia"
-                    st.session_state.live_results = execute_live_inference(st.session_state.active_image)
+                    st.session_state.validation_error = None
+                    st.session_state.live_results = execute_live_inference(img)
         with cs2:
             if st.button("Load Normal Sample", use_container_width=True):
                 if SAMPLE_NORM.exists():
-                    st.session_state.active_image = Image.open(SAMPLE_NORM)
+                    img = Image.open(SAMPLE_NORM)
+                    st.session_state.active_image = img
                     st.session_state.image_name = "Sample: Normal / No Pneumonia"
-                    st.session_state.live_results = execute_live_inference(st.session_state.active_image)
+                    st.session_state.validation_error = None
+                    st.session_state.live_results = execute_live_inference(img)
 
-    # DISPLAY RESULTS IF IMAGE IS ACTIVE
-    if st.session_state.active_image is not None and st.session_state.live_results is not None:
+    # 1. DISPLAY OUT-OF-DISTRIBUTION WARNING IF INVALID IMAGE
+    if st.session_state.validation_error is not None:
+        st.divider()
+        col_rej_img, col_rej_msg = st.columns([1, 1.4])
+        with col_rej_img:
+            st.image(st.session_state.active_image, caption=f"Rejected Input: {st.session_state.image_name}", width=300)
+        with col_rej_msg:
+            st.error("## ⚠️ Invalid Image: Out-of-Distribution Input")
+            st.warning(f"**Modality Screening Rejection:**\n\n{st.session_state.validation_error}")
+            st.info(
+                "🛡️ **Clinical Safety & OOD Protection Gate:**\n\n"
+                "To prevent clinical misdiagnoses on non-medical imagery, text documents, or arbitrary photos, "
+                "the system verifies that incoming scans possess authentic radiographic thoracic contrast and grayscale characteristics. "
+                "Model inference was suspended to prevent erroneous classification."
+            )
+
+    # 2. DISPLAY RESULTS IF IMAGE IS ACTIVE AND VALID
+    elif st.session_state.active_image is not None and st.session_state.live_results is not None:
         res = st.session_state.live_results
         
         st.divider()
@@ -329,6 +405,8 @@ with tab2:
         )
         st.plotly_chart(fig_grouped, use_container_width=True)
 
+    elif st.session_state.validation_error is not None:
+        st.warning(f"⚠️ **Comparator Inactive:** `{st.session_state.image_name}` was flagged as an invalid / out-of-distribution image. Please upload an authentic chest radiograph in Tab 1.")
     else:
         st.info("👆 Please upload an image in Tab 1 to activate the live model comparator.")
 
