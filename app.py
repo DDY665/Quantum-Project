@@ -12,7 +12,6 @@ import plotly.graph_objects as go
 # 1. PAGE SETUP
 st.set_page_config(
     page_title="Quantum & Classical Pneumonia Detection System",
-    page_icon="🫁",
     layout="wide"
 )
 
@@ -199,13 +198,13 @@ def execute_live_inference(image: Image.Image):
 # ============================================================================
 # APP TITLE & TABS
 # ============================================================================
-st.title("🫁 Dynamic Pneumonia Detection & Model Comparator")
+st.title("Dynamic Pneumonia Detection & Model Comparator")
 st.markdown("### DenseNet vs. Vision Transformer (ViT) vs. Quantum Machine Learning")
 
 tab1, tab2, tab3 = st.tabs([
-    "📸 Tab 1 — X-ray Prediction",
-    "⚖️ Tab 2 — Live Model Comparator",
-    "📊 Tab 3 — Overall Training & Performance"
+    "Tab 1 — X-ray Prediction",
+    "Tab 2 — Live Model Comparator",
+    "Tab 3 — Overall Training & Performance"
 ])
 
 # ============================================================================
@@ -262,10 +261,10 @@ with tab1:
         with col_rej_img:
             st.image(st.session_state.active_image, caption=f"Rejected Input: {st.session_state.image_name}", width=300)
         with col_rej_msg:
-            st.error("## ⚠️ Invalid Image: Out-of-Distribution Input")
+            st.error("## Invalid Image: Out-of-Distribution Input")
             st.warning(f"**Modality Screening Rejection:**\n\n{st.session_state.validation_error}")
             st.info(
-                "🛡️ **Clinical Safety & OOD Protection Gate:**\n\n"
+                "**Clinical Safety & OOD Protection Gate:**\n\n"
                 "To prevent clinical misdiagnoses on non-medical imagery, text documents, or arbitrary photos, "
                 "the system verifies that incoming scans possess authentic radiographic thoracic contrast and grayscale characteristics. "
                 "Model inference was suspended to prevent erroneous classification."
@@ -291,9 +290,9 @@ with tab1:
             final_conf = max(p_pneu_avg, p_norm_avg)
 
             if final_class == "Pneumonia":
-                st.error(f"## 🚨 Result: **PNEUMONIA DETECTED**")
+                st.error(f"## Result: **PNEUMONIA DETECTED**")
             else:
-                st.success(f"## ✅ Result: **NORMAL / NO PNEUMONIA**")
+                st.success(f"## Result: **NORMAL / NO PNEUMONIA**")
             
             st.markdown(f"#### **Actual Prediction Confidence:** `{final_conf:.2f}%`")
             st.caption(f"Calculated from live softmax logits across models | Source: {st.session_state.image_name}")
@@ -318,7 +317,7 @@ with tab1:
             st.plotly_chart(fig_prob, use_container_width=True)
 
     else:
-        st.info("👆 Please upload a chest X-ray or click one of the sample buttons above to generate live predictions.")
+        st.info("Please upload a chest X-ray or click one of the sample buttons above to generate live predictions.")
 
 # ============================================================================
 # TAB 2: LIVE MODEL COMPARATOR
@@ -397,9 +396,9 @@ with tab2:
         st.plotly_chart(fig_grouped, use_container_width=True)
 
     elif st.session_state.validation_error is not None:
-        st.warning(f"⚠️ **Comparator Inactive:** `{st.session_state.image_name}` was flagged as an invalid / out-of-distribution image. Please upload an authentic chest radiograph in Tab 1.")
+        st.warning(f"**Comparator Inactive:** `{st.session_state.image_name}` was flagged as an invalid / out-of-distribution image. Please upload an authentic chest radiograph in Tab 1.")
     else:
-        st.info("👆 Please upload an image in Tab 1 to activate the live model comparator.")
+        st.info("Please upload an image in Tab 1 to activate the live model comparator.")
 
 # ============================================================================
 # TAB 3: OVERALL TRAINING & PERFORMANCE (STATIC)
@@ -407,7 +406,7 @@ with tab2:
 with tab3:
     st.subheader("Overall Training & Performance (Static Test-Set Evaluation)")
     st.markdown(
-        "📌 **Note:** Visualizations in this section are **STATIC** scientific benchmarks compiled from the completed "
+        "**Note:** Visualizations in this section are **STATIC** scientific benchmarks compiled from the completed "
         "training runs and evaluated across the entire test dataset (1,757 patient chest X-rays)."
     )
 
